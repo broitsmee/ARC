@@ -1,0 +1,101 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+contract ArcLPTakingFarm {
+    IERC20 public immutable lpToken;       // DEX contract-er share/LP token
+    IERC20 public immutable rewardToken;   // Reward hisebe je token deya hobe
+
+    uint public constant REWARD_RATE = 10 * 1e18; // 10 Reward tokens per second (assuming 18 decimals)
+    uint public lastRewardBlockTimestamp;
+    uint public accRewardPerShare;         // Accumulated rewards per share, multiplied by 1e12 for precision
+
+    uint public totalStaked;
+
+    struct UserInfo {
+        uint stakedAmount;
+        uint rewardDebt;                   // Reward debt calculate korar variable
+    }
+
+    mapping(address => UserInfo) public userInfo;
+
+    constructor(address _lpToken, address _rewardToken) {
+        lpToken = IERC20(_lpToken);
+        rewardToken = IERC20(_rewardToken);
+        lastRewardBlockTimestamp = block.timestamp;
+    }
+
+    // Pool update logic (Protiti state change transaction-er age pool update hobe)
+    function updatePool() public {
+        if (block.timestamp <= lastRewardBlockTimestamp) return;
+        if (totalStaked == 0) {
+            lastRewardBlockTimestamp = block.timestamp;
+            return;
+        }
+        
+        uint timePassed = block.timestamp - lastRewardBlockTimestamp;
+        uint reward = timePassed * REWARD_RATE;
+        
+        // Share accuracy dhore rakhar jonno 1e12 diye multiply kora hoyeche
+        accRewardPerShare += (reward * 1e12) / totalStaked;
+        lastRewardBlockTimestamp = block.timestamp;
+    }
+
+    // 1. LP Token Stake korar function
+    function stake(uint _amount) external {
+        UserInfo storage user = userInfo[msg.sender];
+        updatePool();
+
+        // User-er jodi age theke stake thake, tobe ager generate hoa reward transfer hobe
+        if (user.stakedAmount > 0) {
+            uint pending = ((user.stakedAmount * accRewardPerShare) / 1e12) - user.rewardDebt;
+            if (pending > 0) {
+                rewardToken.transfer(msg.sender, pending);
+            }
+        }
+
+        if (_amount > 0) {
+            lpToken.transferFrom(msg.sender, address(this), _amount);
+            user.stakedAmount += _amount;
+            totalStaked += _amount;
+        }
+
+        user.rewardDebt = (user.stakedAmount * accRewardPerShare) / 1e12;
+    }
+
+    // 2. Stake un-stake ba withdraw korar function
+    function withdraw(uint _amount) external {
+        UserInfo storage user = userInfo[msg.sender];
+        require(user.stakedAmount >= _amount, "Withdraw amount exceeds balance");
+        updatePool();
+
+        // Withdraw korar shomoy accumulated pending reward automatically payout hobe
+        uint pending = ((user.stakedAmount * accRewardPerShare) / 1e12) - user.rewardDebt;
+        if (pending > 0) {
+            rewardToken.transfer(msg.sender, pending);
+        }
+
+        if (_amount > 0) {
+            user.stakedAmount -= _amount;
+            totalStaked -= _amount;
+            lpToken.transfer(msg.sender, _amount);
+        }
+
+        user.rewardDebt = (user.stakedAmount * accRewardPerShare) / 1e12;
+    }
+
+    // 3. Frontend ba UI-te user-er live pending reward check korar view function
+    function pendingReward(address _user) external view returns (uint) {
+        UserInfo memory user = userInfo[_user];
+        uint _accRewardPerShare = accRewardPerShare;
+        
+        if (block.timestamp > lastRewardBlockTimestamp && totalStaked != 0) {
+            uint timePassed = block.timestamp - lastRewardBlockTimestamp;
+            uint reward = timePassed * REWARD_RATE;
+            _accRewardPerShare += (reward * 1e12) / totalStaked;
+        }
+        
+        return ((user.stakedAmount * _accRewardPerShare) / 1e12) - user.rewardDebt;
+    }
+}
