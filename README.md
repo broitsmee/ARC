@@ -1,81 +1,65 @@
-# ARChttps:// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+# ARC Decentralized Ecosystem
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.md";
+Welcome to the **ARC Decentralized Ecosystem**, a comprehensive suite of advanced smart contracts powering next-generation Web3 protocols. This repository contains the production-ready source code for a custom Automated Market Maker (AMM) DEX, a Liquidity Provider (LP) Staking Farm, a Collateralized Lending Pool, and a DAO Governance Protocol, alongside Fractional NFT tokenization mechanics.
 
-contract ArcTestnetDEX {
-    IERC20 public immutable token0;
-    IERC20 public immutable token1;
+All contracts are written in Solidity (`^0.8.20`) utilizing standard OpenZeppelin libraries and are optimized for secure compilation and deployment on EVM-compatible networks.
 
-    uint public reserve0;
-    uint public reserve1;
+---
 
-    uint public totalSupply;
-    mapping(address => uint) public balanceOf;
+## 🚀 Deployed Contract Addresses (Arc Network Testnet)
 
-    constructor(address _token0, address _token1) {
-        token0 = IERC20(_token0);
-        token1 = IERC20(_token1);
-    }
+The entire ecosystem has been successfully compiled and deployed live on the **Arc Network Testnet**. Below are the official smart contract tracking hashes:
 
-    // Internal minting for liquidity providers
-    function _mint(address _to, uint _amount) private {
-        balanceOf[_to] += _amount;
-        totalSupply += _amount;
-    }
+| Contract Name | Deployed Contract Address |
+| :--- | :--- |
+| **MockToken (TokenA)** | `0x6BcC63FF3FFbA52A1762B34Bf5DeA21f84331837` |
+| **MockToken (TokenB)** | `0xB357871b63B96A8EAb5b796ED4B9695669fA2e7` |
+| **ArcTestnetDEX** | `0x4C97BeDE525Bcf359e195bfbB3b7f14b7bC3B` |
+| **ArcLendingPool** | `0xB082b2F97b5e406324dBFdf11707B1dD7a2212F7` |
+| **ArcLPTakingFarm** | `0xe8c7f999Fbc2db481EaC984bC9d30c50C7774280` |
+| **ArcGovernanceDAO** | `0x9830CD8dB9a7647BdfA952b14644daFda6C792D1` |
+| **MockNFT** | `0x767ec170458BcC15B1aE705f0273396715E0E467` |
+| **ArcFractionalNFT** | `0xb58999f8d55B5CC3A566141a087a32C3A563De03` |
 
-    // Swap function: Give token0, get token1
-    function swap(address _tokenIn, uint _amountIn) external returns (uint amountOut) {
-        bool isToken0 = _tokenIn == address(token0);
-        (IERC20 tokenIn, IERC20 tokenOut, uint resIn, uint resOut) = isToken0
-            ? (token0, token1, reserve0, reserve1)
-            : (token1, token0, reserve1, reserve0);
+---
 
-        tokenIn.transferFrom(msg.sender, address(this), _amountIn);
+## 🛠️ Core Ecosystem Modules
 
-        // Constant Product Formula: (x + dx)(y - dy) = xy
-        // dy = (y * dx) / (x + dx)
-        uint amountInWithFee = (_amountIn * 997) / 1000; // 0.3% fee
-        amountOut = (resOut * amountInWithFee) / (resIn + amountInWithFee);
+### 1. Automated Market Maker DEX (`ArcTestnetDEX.sol`)
+A custom Decentralized Exchange implementing the standard Constant Product Market Maker formula ($x \times y = k$).
+* **Liquidity Provision:** Allows users to pool token pairs (`token0` and `token1`) to provision trade liquidity, dynamic price calculations, and mint internal tracking shares.
+* **Automated Swaps:** Enables instant token-to-token swaps backed by automated reserve updates.
 
-        tokenOut.transfer(msg.sender, amountOut);
+### 2. LP Staking Farm (`ArcLPTakingFarm.sol`)
+A yield-generating farming protocol designed to incentivize liquidity providers.
+* **Yield Staking:** Users can lock their LP tokens generated from the DEX to earn passive continuous rewards.
+* **Dynamic Reward Distribution:** Computes individual rewards per block using block-timestamp delta factors.
 
-        _updateReserves();
-    }
+### 3. Collateralized Lending Pool (`ArcLendingPool.sol`)
+A decentralized lending and borrowing framework modeled after over-collateralized isolated lending pools.
+* **Liquidity Supply:** Lenders deposit base assets to provide pool depth and accrue structural interest.
+* **Collateralized Borrows:** Borrowers deposit a dynamic secondary asset as security to safely borrow up to a **75% Collateral Ratio** of their holding value.
 
-    function _updateReserves() private {
-        reserve0 = token0.balanceOf(address(this));
-        reserve1 = token1.balanceOf(address(this));
-    }
+### 4. DAO Governance Protocol (`ArcGovernanceDAO.sol`)
+A completely decentralized governance architecture empowering community token-holders.
+* **Proposal Creation:** Users meeting a threshold requirement (min. 100 governance tokens) can propose protocol parameter upgrades.
+* **Weighted Voting:** Implements democratic 1-Token-1-Vote weights over a set **3-day voting period**.
 
-    function addLiquidity(uint _amount0, uint _amount1) external returns (uint shares) {
-        token0.transferFrom(msg.sender, address(this), _amount0);
-        token1.transferFrom(msg.sender, address(this), _amount1);
+### 5. Fractional NFT Contract (`ArcFractionalNFT.sol`)
+An asset-splitting protocol that bridges unique digital assets with ERC-20 utility markets.
+* **NFT Locking:** Secures an incoming ERC-721 NFT collection item inside the vault logic.
+* **Fractions Minting:** Generates proportional, fractionally liquid ERC-20 shares back to the original controller.
 
-        if (totalSupply == 0) {
-            shares = _sqrt(_amount0 * _amount1);
-        } else {
-            shares = _min((_amount0 * totalSupply) / reserve0, (_amount1 * totalSupply) / reserve1);
-        }
+---
 
-        _mint(msg.sender, shares);
-        _updateReserves();
-    }
+## 🛠️ Tech Stack & Dependencies
 
-    function _sqrt(uint y) internal pure returns (uint z) {
-        if (y > 3) {
-            z = y;
-            uint x = y / 2 + 1;
-            while (x < z) {
-                z = x;
-                x = (y / x + x) / 2;
-            }
-        } else if (y != 0) {
-            z = 1;
-        }
-    }
+* **Language:** Solidity `^0.8.20`
+* **Framework:** Remix IDE & OpenZeppelin Standard Libraries
+* **Token Standards Supported:** ERC-20 (Fungible Tokens), ERC-721 (Non-Fungible Tokens), ERC-721Holder
 
-    function _min(uint x, uint y) internal pure returns (uint) {
-        return x <= y ? x : y;
-    }
-}
+---
+
+## 🛡️ License
+
+This project is licensed under the **MIT License**. Feel free to fork, test, and adapt the modules for custom protocol architectures.
