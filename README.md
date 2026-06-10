@@ -12,8 +12,8 @@ The entire ecosystem has been successfully compiled and deployed live on the **A
 
 | Contract Name | Deployed Contract Address |
 | :--- | :--- |
-| **MockToken (TokenA)** | `0x6BcC63FF3FFbA52A1762B34Bf5DeA21f84331837` |
-| **MockToken (TokenB)** | `0xB357871b63B96A8EAb5b796ED4B9695669fA2e7` |
+| **MockToken (TokenA)** | `0x6BcC7dFdC5ad120313e20A6AeEE6C58dC4e31837` |
+| **MockToken (TokenB)** | `0xB3596934302Db70359E7A2033c401971F12fA2e7` |
 | **ArcTestnetDEX** | `0x4C974B1DAac51F94f7eEcA61eEfb889Ed8a7bC3B` |
 | **ArcLendingPool** | `0xB08ed23C2Cc566b1932e7A7254d88DE1c9C212F7` |
 | **ArcLPTakingFarm** | `0xe8c6D1cbfdd17E8595B2eCb3C6933b1157774280` |
