@@ -14,12 +14,12 @@ The entire ecosystem has been successfully compiled and deployed live on the **A
 | :--- | :--- |
 | **MockToken (TokenA)** | `0x6BcC63FF3FFbA52A1762B34Bf5DeA21f84331837` |
 | **MockToken (TokenB)** | `0xB357871b63B96A8EAb5b796ED4B9695669fA2e7` |
-| **ArcTestnetDEX** | `0x4C97BeDE525Bcf359e195bfbB3b7f14b7bC3B` |
-| **ArcLendingPool** | `0xB082b2F97b5e406324dBFdf11707B1dD7a2212F7` |
-| **ArcLPTakingFarm** | `0xe8c7f999Fbc2db481EaC984bC9d30c50C7774280` |
-| **ArcGovernanceDAO** | `0x9830CD8dB9a7647BdfA952b14644daFda6C792D1` |
+| **ArcTestnetDEX** | `0x4C974B1DAac51F94f7eEcA61eEfb889Ed8a7bC3B` |
+| **ArcLendingPool** | `0xB08ed23C2Cc566b1932e7A7254d88DE1c9C212F7` |
+| **ArcLPTakingFarm** | `0xe8c6D1cbfdd17E8595B2eCb3C6933b1157774280` |
+| **ArcGovernanceDAO** | `0x9832244C1DABe3646f0B6F6f4f75Fd7be1F792D1` |
 | **MockNFT** | `0x767ec170458BcC15B1aE705f0273396715E0E467` |
-| **ArcFractionalNFT** | `0xb58999f8d55B5CC3A566141a087a32C3A563De03` |
+| **ArcFractionalNFT** | `0xb58877715Fe39Ef3aDe6c4F39982F5592683De03` |
 
 ---
 
